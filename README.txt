@@ -11,6 +11,19 @@ can see what's going on. libcompile.sh compiles
 the library code. srccompile.sh compiles a sample
 program using the library.
 
+How to Run
+Copy and Paste the commands into terminal from
+project root directory (same dir as this README).
+Must be running on Linux.
+---COMMAND START---
+./libcompile.sh
+./srccompile.sh
+./build/testprog.o
+----COMMAND END----
+Explanation: 1) Compile library. 2) Compile src
+program. 3) run src program (testprog.o).
+Should output "Hello".
+
 Build Pipeline Objectives
 Migrate from the bash shell scripts to a more
 robust build system, probably CMake or something.
