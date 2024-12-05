@@ -1,6 +1,7 @@
 #include "distributed_trace.h"
 #include <iostream>
 
-void printHello() {
+int printHello() {
     std::cout << "Hello\n";
+    return 0;
 }

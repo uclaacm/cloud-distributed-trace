@@ -5,4 +5,4 @@
 
 #pragma once
 
-void printHello();
+int printHello();
