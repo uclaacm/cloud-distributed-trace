@@ -1,1 +1,23 @@
 # Put docker compose config here
+services:
+  node1:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    volumes:
+      - ../build:/app/build
+    networks:
+      - project_network
+
+  node2:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    volumes:
+      - ../build:/app/build
+    networks:
+      - project_network
+
+networks:
+  project_network:
+    driver: bridge
