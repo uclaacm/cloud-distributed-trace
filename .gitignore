@@ -1,6 +1,6 @@
 build/*
 .clangd
-
+log/*
 
 # ignore cmake files
 CMakeLists.txt.user
