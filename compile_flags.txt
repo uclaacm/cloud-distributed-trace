@@ -1,3 +1,0 @@
-# make clangd STFU about include path errors
--I
-include/

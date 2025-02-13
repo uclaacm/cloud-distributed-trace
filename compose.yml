@@ -1,0 +1,28 @@
+services:
+  client:
+    build:
+      context: .
+      args:
+        DIRECTORY: "client"
+        BINARY: "client"
+    networks:
+      project_network:
+        ipv4_address: 192.168.0.101
+
+  server:
+    build:
+      context: .
+      args:
+        DIRECTORY: "server"
+        BINARY: "server"
+    networks:
+      project_network:
+        ipv4_address: 192.168.0.100
+
+networks:
+  project_network:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 192.168.0.0/24
+         gateway: 192.168.0.1

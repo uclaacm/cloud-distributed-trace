@@ -1,0 +1,6 @@
+file(GLOB NODES LIST_DIRECTORIES true "*")
+foreach(NODE ${NODES})
+    if(IS_DIRECTORY ${NODE} AND EXISTS ${NODE}/CMakeLists.txt)
+        add_subdirectory(${NODE})
+    endif()
+endforeach()
