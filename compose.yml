@@ -1,0 +1,24 @@
+# Put docker compose config here
+
+services:
+  client:
+    build:
+      context: .
+      args:
+        DIRECTORY: "client"
+        BINARY: "client"
+    networks:
+      - project_network
+
+  server:
+    build:
+      context: .
+      args:
+        DIRECTORY: "server"
+        BINARY: "server"
+    networks:
+      - project_network
+
+networks:
+  project_network:
+    driver: bridge
