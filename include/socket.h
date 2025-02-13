@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdint>
 #include <netinet/in.h>
 #include <string>
@@ -12,17 +13,19 @@ class Socket {
 private:
     int sockfd;
     sockaddr_in address;
+    std::vector<char> sbuf;
 
+    Socket(int sockfd): sockfd(sockfd) {}
 public:
-    Socket() : sockfd(-1) {}
-    void initialize(ip_t host, port_t port);
-    void create(af_t family, socktype_t type);
-    void bind();
-    void listen(int backlog);
-    int accept();
-    int connect();
-    int send(const std::vector<char>& data);
-    std::vector<char> receive(int buffer_size);
+    Socket(af_t family, socktype_t type);
+    int bind(port_t port);
+    int listen(int backlog);
+    Socket accept();
+    int connect(ip_t target, port_t port);
+    int send(const std::string s);
+    int send(const std::vector<std::byte>& buffer, int send_size);
+    int receive(std::string& s, int recv_size);
+    int receive(std::vector<std::byte>& buffer, int recv_size);
     void close();
     ~Socket();
 };

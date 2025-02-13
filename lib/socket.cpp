@@ -1,75 +1,76 @@
 #include "socket.h"
 #include <arpa/inet.h>
 #include <cstring>
+#include <netinet/in.h>
 #include <stdexcept>
+#include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
 
-void Socket::initialize(ip_t host, port_t port) {
-    std::memset(&address, 0, sizeof(address));
-    address.sin_family = AF_INET;
-    address.sin_port = htons(port);
-
-    if (inet_pton(AF_INET, host.c_str(), &address.sin_addr) <= 0) {
-        throw std::invalid_argument("Invalid IP address.");
-    }
-}
-
-void Socket::create(af_t family, socktype_t type) {
+Socket::Socket(af_t family, socktype_t type) {
     sockfd = socket(family, type, 0);
-    if (sockfd < 0) {
+    if (sockfd < 0)
         throw std::runtime_error("Failed to create socket.");
-    }
+    address.sin_family = family;
+    address.sin_addr.s_addr = INADDR_ANY;
 }
 
-void Socket::bind() {
-    if (::bind(sockfd, reinterpret_cast<struct sockaddr*>(&address), sizeof(address)) < 0) {
-        throw std::runtime_error("Failed to bind socket.");
-    }
+int Socket::bind(port_t port) {
+    address.sin_port = htons(port);
+    return ::bind(sockfd, reinterpret_cast<struct sockaddr*>(&address), sizeof(address));
 }
 
-void Socket::listen(int backlog) {
-    if (::listen(sockfd, backlog) < 0) {
-        throw std::runtime_error("Failed to listen on socket.");
-    }
+int Socket::listen(int backlog) {
+    return ::listen(sockfd, backlog);
 }
 
-int Socket::accept() {
-    sockaddr_in client_addr;
-    socklen_t client_len = sizeof(client_addr);
-    int client_sock = ::accept(sockfd, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
-
+Socket Socket::accept() {
+    socklen_t client_len = sizeof(address);
+    int client_sock = ::accept(sockfd, reinterpret_cast<struct sockaddr*>(&address), &client_len);
     if (client_sock < 0) {
         throw std::runtime_error("Failed to accept connection.");
     }
-    return client_sock;
+    return Socket(client_sock);
 }
 
-int Socket::connect() {
+int Socket::connect(ip_t target, port_t port) {
+    address.sin_port = htons(port);
+    if (inet_pton(AF_INET, "192.168.0.100", &address.sin_addr) <= 0) {
+        return -1;
+    }
     if (::connect(sockfd, reinterpret_cast<struct sockaddr*>(&address), sizeof(address)) < 0) {
-        perror("Connection failed");
         return -1;
     }
     return 0;
 }
 
-int Socket::send(const std::vector<char> &data) {
-    ssize_t bytes_sent = ::send(sockfd, data.data(), data.size(), 0);
-    if (bytes_sent < 0) {
-        throw std::runtime_error("Failed to send data.");
-    }
+int Socket::send(const std::string s) {
+    ssize_t bytes_sent = ::send(sockfd, s.c_str(), s.length(), 0);
     return static_cast<int>(bytes_sent);
 }
 
-std::vector<char> Socket::receive(int buffer_size) {
-    std::vector<char> buffer(buffer_size);
-    ssize_t bytes_received = recv(sockfd, buffer.data(), buffer_size, 0);
+int Socket::send(const std::vector<std::byte>& buffer, int send_size) {
+    if (buffer.size() < send_size)
+        return -1;
+    ssize_t bytes_sent = ::send(sockfd, buffer.data(), send_size, 0);
+    return static_cast<int>(bytes_sent);
+}
 
-    if (bytes_received < 0) {
-        throw std::runtime_error("Failed to receive data.");
-    }
-    buffer.resize(bytes_received); // Trim buffer to actual data size
-    return buffer;
+int Socket::receive(std::string& s, int recv_size) {
+    sbuf.resize(recv_size);
+
+    ssize_t bytes_received = recv(sockfd, &sbuf[0], recv_size, 0);
+
+    if (bytes_received >= 0)
+        s = std::string(sbuf.data());
+
+    return bytes_received;
+}
+
+int Socket::receive(std::vector<std::byte>& buffer, int recv_size) {
+    buffer.resize(recv_size);
+    ssize_t bytes_received = recv(sockfd, &buffer[0], recv_size, 0);
+    return bytes_received;
 }
 
 void Socket::close() {
