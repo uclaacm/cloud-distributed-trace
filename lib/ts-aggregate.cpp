@@ -25,8 +25,8 @@ void tsaggregate(const std::vector<std::string>& filepaths) {
             std::string timestamp;
             input >> timestamp;
             
-            char message[100]; // this is inefficient code!
-            input.getline(message, 100);
+            std::string message;
+            std::getline(input, message, '\n');
 
             logentry curr;
             curr.timestamp = std::stoi(timestamp);
@@ -40,7 +40,10 @@ void tsaggregate(const std::vector<std::string>& filepaths) {
 
     std::sort(logs.begin(), logs.end());
 
-    std::ofstream output("../log/aggregated.log");
+    // automatically creates log/aggregated.log if it does not exist. however,
+    // WARNING! overrides ALL existing data in log/aggregated.log. if needed,
+    // a backup log functionality can be provided. we'll see.
+    std::ofstream output("../log/aggregated.log", std::ios_base::out);
     for (const logentry& entry : logs) {
         output << entry << std::endl;
     }
