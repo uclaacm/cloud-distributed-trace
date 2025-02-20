@@ -3,8 +3,6 @@
  * to be called.
 */
 
-#include <iostream>
-
 #pragma once
 
-int printHello();
+#include "socket.h"

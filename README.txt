@@ -16,9 +16,8 @@ Copy and Paste the commands into terminal from
 project root directory (same dir as this README).
 Must be running on Linux.
 ---COMMAND START---
-./libcompile.sh
-./srccompile.sh
-./build/testprog.o
+cmake -S . -B build
+cd build && make && cd ..
 ----COMMAND END----
 Explanation: 1) Compile library. 2) Compile src
 program. 3) run src program (testprog.o).
