@@ -18,3 +18,4 @@ add_library(${LIB_NAME} STATIC ${LIB_SOURCES})
 target_include_directories(${LIB_NAME} PUBLIC include)
 
 add_subdirectory(src)
+add_subdirectory(debugger)
